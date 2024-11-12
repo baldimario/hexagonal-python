@@ -35,6 +35,8 @@ class Main:  # pylint: disable=too-few-public-methods
 
         print("Main CLI (qb)", result)
 
+        parameter = result.result if result is not None else "two"
+
         self.command_bus.execute(
-            ExampleCommand(parameter_one="one", parameter_two="two")
+            ExampleCommand(parameter_one="one", parameter_two=parameter)
         )

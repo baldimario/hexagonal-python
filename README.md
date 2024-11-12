@@ -10,6 +10,10 @@ DDD and CQRS in Modern Python Environment
 ---
 This project is a proof-of-concept template designed to demonstrate the application of Domain-Driven Design (DDD) and Command Query Responsibility Segregation (CQRS) principles in a modern Python environment. It is intended for educational purposes only and should not be used in production without thorough testing and validation.
 
+## Usage
+
+When using this project template, you should copy the template, keep what you need, and remove what you don't. This will allow you to tailor the project to your specific requirements and avoid unnecessary complexity.
+
 ## Features
 
 - 🔄 Isolated endvironment:
@@ -53,6 +57,27 @@ This project is a proof-of-concept template designed to demonstrate the applicat
     - AWS Lambda
     - OpenFaas
     - Celery
+- 🔄 Docker Services Preset with Reverse Proxy:
+    - ✅ Traefik
+    - ✅ Mailcatcher
+    - ✅ Redis
+    - ✅ Redisinsight
+    - ✅ RabbitMQ
+    - ✅ Kafka
+    - ✅ MySQL
+    - ✅ Phpmyadmin
+    - ✅ PostgreSQL
+    - ✅ Pgadmin
+    - ✅ Minio
+    - ✅ Keycloak
+    - ✅ Cassandra
+    - ✅ Cassandra-web
+    - ✅ Ollama
+    - ✅ Open-WebUI
+    - ✅ ElasticSearch
+    - ✅ Kibana
+    - ✅ Dejavu
+    - Localstack
 
 
 ## Usage
@@ -172,3 +197,33 @@ To generate coverage report in interactive html format, run:
 ```bash
 make coverage-html
 ```
+
+---
+
+## Web Dashboards on reverse proxy
+
+`lvh.me` is a special domain name that resolves to `127.0.0.1` (`localhost`) by default. This allows you to use it as a shortcut for local development, instead of `*.localhost`. All its subdomains also point to `127.0.0.1`, making it a convenient choice for local development environments.
+
+All subdomains and main domain are configured in the `stack/docker/.env` file.
+These are the default subdomains.
+
+| Env var | Domain | Description |
+|---|---|---|
+| DOMAIN | lvh.me | Main domain |
+| REVERSE_PROXY_SUBDOMAIN | reverse-proxy.lvh.me | Points to Traefik web ui |
+| STORAGE_SUBDOMAIN | storage-admin.lvh.me | Points to minio admin panel |
+| STORAGE_API_SUBDOMAIN | storage-api.lvh.me | Points to minio APIs |
+| RABBITMQ_SUBDOMAIN | rabbitmq-management.lvh.me | RabbitMQ management interface |
+| PHPMYADMIN_SUBDOMAIN | phpmyadmin.lvh.me | phpMyAdmin panel |
+| PGADMIN_SUBDOMAIN | pgadmin.lvh.me | pgadmin panel |
+| MAIL_SUBDOMAIN | mail.lvh.me | mailcatcher interface |
+| REDISINSIGHT_SUBDOMAIN | redis-insight.lvh.me | redis management interface |
+| CASSANDRA_WEB_SUBDOMAIN | cassandra-web.lvh.me | cassandra management interface |
+| LOCAL_SUBDOMAIN | local.lvh.me | local domain to manage development 4th level domains |
+| LLM_SUBDOMAIN | llm.lvh.me | ollama api |
+| OPEN_WEBUI_SUBDOMAIN | ai.lvh.me | web panel for llm managgement |
+| ELASTICSEARCH_SUBDOMAIN | search.lvh.me | elasticsearch |
+| DEJAVU_SUBDOMAIN | dejavu.lvh.me | elasticsearch management interface |
+| KIBANA_SUBDOMAIN | kibana.lvh.me | kibana admin panel for bi |
+| KAFKA_UI_SUBDOMAIN | kafka-ui.lvh.me | kafka management interface |
+| LOCALSTACK_GATEWAY_SUBDOMAIN| localstack.lvh.me | localstack gateway |

@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 SHELL := /bin/sh
 ENV ?= dev
-SERVICE ?= app 
+SERVICE ?= app
 
 DC ?= docker compose -f stack/docker/docker-compose.y*ml -f stack/docker/docker-compose.${ENV}.y*ml
 
@@ -15,19 +15,16 @@ push: ## Push docker containers
 	${DC} push ${SERVICE}
 
 build: ## Build docker containers
-	${DC} build ${SERVICE}
+	${DC} build
 
 up: ## Start docker containers
-	echo ${DC} up -d ${SERVICE}
+	${DC} up -d
 
 run: ## Start docker containers attached
-	${DC} up ${SERVICE}
-
-debug: ## Start docker containers attached
-	${DC} up ${SERVICE}
+	${DC} up
 
 down: ## Shutdown docker containers
-	${DC} down ${SERVICE}
+	${DC} down
 
 ps: ## List docker containers
 	${DC} ps
