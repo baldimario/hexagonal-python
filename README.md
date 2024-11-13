@@ -79,6 +79,21 @@ When using this project template, you should copy the template, keep what you ne
     - ✅ Dejavu
     - ✅ Localstack
 
+## Enable Services using docker compose profiles
+
+In the `.env.make` that overrides `stack/docker/.env` file for the `COMPOSE_PROFILES` environment vairable, you can enable or disable services by adding or removing the service name from the `COMPOSE_PROFILES` variable.
+
+The default profile is `default` and it is always enabled, it is used to enable the default services that are always required: `app`, `dnsmasq`, `traefik`.
+
+For example: to enable RabbitMQ, add `rabbitmq` to the `COMPOSE_PROFILES` variable, like this:
+
+
+```bash
+COMPOSE_PROFILES=default,rabbitmq
+```
+
+A special profile is `all` that enables all services.
+
 
 ## Usage
 

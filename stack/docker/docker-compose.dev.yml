@@ -15,6 +15,26 @@ services:
       - ../../app:/app
     env_file:
       - ../../app/.env.dev
+    profiles:
+      - all
+      - default
+      - app
+
+  dnsmasq:
+    build:
+      context: dnsmasq/
+      dockerfile: Dockerfile
+    labels:
+      name: dnsmasq
+    command: "--address=/$LOCAL_SUBDOMAIN.$DOMAIN/172.17.0.1 --address=/$DOMAIN/172.17.0.1 --log-facility=- --filter-AAAA"
+    cap_add: [NET_ADMIN]
+    networks:
+      proxy:
+        ipv4_address: 172.16.2.254
+    profiles:
+      - all
+      - default
+      - dnsmasq
 
   traefik:
     image: traefik:2.4
@@ -36,401 +56,456 @@ services:
       - traefik.http.routers.traefik_dashboard_router.rule=Host(`${REVERSE_PROXY_SUBDOMAIN}.${DOMAIN}`)
       - traefik.http.routers.traefik_dashboard_router.service=traefik
       - traefik.http.services.traefik.loadbalancer.server.port=8080
+    profiles:
+      - all
+      - default
+      - traefik
 
-  # minio:
-  #   image: minio/minio:latest
-  #   command: server /data --console-address ":9001"
-  #   environment:
-  #     MINIO_ROOT_USER: root
-  #     MINIO_ROOT_PASSWORD: rootpass
-  #   volumes:
-  #     - ./data/minio:/data
-  #   networks:
-  #     - proxy
-  #   dns:
-  #     - 172.16.2.254
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.minio-api.rule=Host(`${STORAGE_API_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.routers.minio-api.service=minio-api
-  #     - traefik.http.routers.minio-api.entrypoints=http
-  #     - traefik.http.services.minio-api.loadbalancer.server.port=9000
-  #     - traefik.http.routers.minio-admin.rule=Host(`${STORAGE_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.routers.minio-admin.service=minio-admin
-  #     - traefik.http.routers.minio-admin.entrypoints=http
-  #     - traefik.http.services.minio-admin.loadbalancer.server.port=9001
-  #
-  # mailcatcher:
-  #   image: dockage/mailcatcher:0.8.2
-  #   networks:
-  #     - proxy
-  #   dns:
-  #     - 172.16.2.254
-  #   labels:
-  #     - name=mailcatcher
-  #     - traefik.enable=true
-  #     - traefik.http.services.mailcatcher.loadbalancer.server.port=1080
-  #     - traefik.http.routers.mailcatcher.rule=Host(`${MAIL_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.routers.mailcatcher.entrypoints=http
-  #
-  # rabbitmq:
-  #   image: rabbitmq:3.10.10-management
-  #   environment:
-  #     - RABBITMQ_DEFAULT_USER=root
-  #     - RABBITMQ_DEFAULT_PASS=root
-  #   dns:
-  #     - 172.16.2.254
-  #   volumes:
-  #     - ./data/rabbitmq:/var/lib/rabbitmq
-  #   networks:
-  #     - proxy
-  #   labels:
-  #     - name=rabbitmq
-  #     - traefik.enable=true
-  #     - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
-  #     - traefik.http.routers.rabbitmq.rule=Host(`${RABBITMQ_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.routers.rabbitmq.entrypoints=http
-  #
-  # mysql:
-  #   image: mysql:8.0
-  #   ports:
-  #     - 33006:3306
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=root
-  #   dns:
-  #     - 172.16.2.254
-  #   volumes:
-  #     - ./data/mysql/data:/var/lib/mysql
-  #     - ./data/mysql/log:/var/log/mysql
-  #   networks:
-  #     - proxy
-  #   labels:
-  #     name: mysql
-  #
-  # phpmyadmin:
-  #   image: phpmyadmin:5.2
-  #   environment:
-  #     - PMA_HOST=mysql
-  #     - PMA_PORT=3306
-  #     - PMA_USER=root
-  #     - PMA_PASSWORD=root
-  #   networks:
-  #     - proxy
-  #   labels:
-  #     - name=phpmyadmin
-  #     - traefik.enable=true
-  #     - traefik.http.routers.phpmyadmin.rule=Host(`${PHPMYADMIN_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.routers.phpmyadmin.entrypoints=http
-  #
-  # postgresql:
-  #   image: postgres
-  #   ports:
-  #     - 5432:5432
-  #   dns:
-  #     - 172.16.2.254
-  #   environment:
-  #     - POSTGRES_USER=root
-  #     - POSTGRES_PASSWORD=root
-  #   volumes:
-  #     - ./data/postgresql:/var/lib/postgresql/data
-  #   networks:
-  #     - proxy
-  #
-  # pgadmin:
-  #   image: dpage/pgadmin4:8.9
-  #   environment:
-  #     - PGADMIN_DEFAULT_EMAIL=root@${DOMAIN}
-  #     - PGADMIN_DEFAULT_PASSWORD=root
-  #     - PGADMIN_LISTEN_ADDRESS=0.0.0.0
-  #     - PGADMIN_LISTEN_PORT=8080
-  #   dns:
-  #     - 172.16.2.254
-  #   volumes:
-  #     - ./data/pgadmin:/var/lib/pgadmin
-  #   networks:
-  #     - proxy
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.pgadmin.rule=Host(`${PGADMIN_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.pgadmin.loadbalancer.server.port=8080
-  #     - traefik.http.routers.pgadmin.entrypoints=http
-  #
-  # redis:
-  #   image: redis:6-alpine
-  #   dns:
-  #     - 172.16.2.254
-  #   volumes:
-  #     - ./config/redis.conf:/usr/local/etc/redis/redis.conf
-  #     - ./data/redis:/data
-  #   networks:
-  #     - proxy
-  #   command: redis-server /usr/local/etc/redis/redis.conf
-  #   labels:
-  #     name: redis
-  #
-  # redisinsight:
-  #   image: redis/redisinsight
-  #   environment:
-  #     - RI_APP_PORT=5540
-  #     - RI_APP_HOST=0.0.0.0
-  #   volumes:
-  #     - ./data/redisinsight:/data
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.redisinsight.rule=Host(`${REDISINSIGHT_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.redisinsight.loadbalancer.server.port=5540
-  #     - traefik.http.routers.redisinsight.entrypoints=http
-  #
-  # keycloak:
-  #   image: quay.io/keycloak/keycloak:26.0.1
-  #   depends_on:
-  #     - postgresql
-  #   environment:
-  #     - KC_DB_URL_HOST=postgresql
-  #     - KC_DB_URL_DATABASE=keycloak
-  #     - KC_DB_USERNAME=root
-  #     - KC_DB_PASSWORD=root
-  #     - KEYCLOAK_ADMIN=root
-  #     - KEYCLOAK_ADMIN_PASSWORD=root
-  #   command: start-dev --proxy-headers forwarded --http-relative-path=/auth
-  #   dns:
-  #     - 172.16.2.254
-  #   ports:
-  #     - 8080:8080
-  #   networks:
-  #     - proxy
-  #   labels:
-  #     - name=keycloak
-  #     - traefik.enable=true
-  #     - traefik.http.services.keycloak.loadbalancer.server.port=8080
-  #     - traefik.http.routers.keycloak.rule=((Host(`${DOMAIN}`) || HostRegexp(`{subdomain:[a-z0-9_-]+}.${DOMAIN}`)) && PathPrefix(`/auth`))  
-  #     - traefik.http.routers.keycloak.entrypoints=http
-  #     - traefik.http.routers.keycloak.service=keycloak
-  #
-  # dnsmasq:
-  #   build:
-  #     context: dnsmasq/
-  #     dockerfile: Dockerfile
-  #   labels:
-  #     name: dnsmasq
-  #   command: "--address=/$LOCAL_SUBDOMAIN.$DOMAIN/172.17.0.1 --address=/$DOMAIN/172.17.0.1 --log-facility=- --filter-AAAA"
-  #   cap_add: [NET_ADMIN]
-  #   networks:
-  #     proxy:
-  #       ipv4_address: 172.16.2.254
-  #
-  # cassandra:
-  #   image: cassandra
-  #   ports:
-  #     - 9042:9042
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #
-  # cassandra-web:
-  #   image: ipushc/cassandra-web
-  #   environment:
-  #     - CASSANDRA_HOST=cassandra
-  #     - CASSANDRA_PORT=9042
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.cassandra-web.rule=Host(`${CASSANDRA_WEB_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.cassandra-web.loadbalancer.server.port=8083
-  #     - traefik.http.routers.cassandra-web.entrypoints=http
-  #     - traefik.http.routers.cassandra-web.service=cassandra-web
-  #
-  # ollama:
-  #   image: ollama/ollama
-  #   volumes:
-  #     - ./data/ollama:/root/.ollama
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #         - driver: nvidia
-  #           count: 1
-  #           capabilities: [gpu]
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.ollama.rule=Host(`${LLM_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.ollama.loadbalancer.server.port=11434
-  #     - traefik.http.routers.ollama.entrypoints=http
-  #     - traefik.http.routers.ollama.service=ollama
-  #
-  # open-webui:
-  #   image: ghcr.io/open-webui/open-webui:main
-  #   volumes:
-  #     - ./data/open-webui:/app/backend/data
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.open-webui.rule=Host(`${OPEN_WEBUI_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.open-webui.loadbalancer.server.port=8080
-  #     - traefik.http.routers.open-webui.entrypoints=http
-  #     - traefik.http.routers.open-webui.service=open-webui
-  #
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.8.2
-  #   environment:
-  #     - xpack.security.enabled=false
-  #     - discovery.type=single-node
-  #     - search.max_buckets=100000
-  #     - indices.id_field_data.enabled=true
-  #     - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-  #     - http.port=9200
-  #     - discovery.type=single-node
-  #     - http.max_content_length=10MB
-  #     - http.cors.enabled=true
-  #     - http.cors.allow-origin=\*
-  #     - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
-  #     - http.cors.allow-credentials=true
-  #     - network.publish_host=localhost
-  #     - xpack.security.enabled=false
-  #   volumes:
-  #     - ./data/elasticsearch:/usr/share/elasticsearch/data
-  #   ports:
-  #     - 9200:9200
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #       - proxy
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.elasticsearch.rule=Host(`${ELASTICSEARCH_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.elasticsearch.loadbalancer.server.port=9200
-  #     - traefik.http.routers.elasticsearch.entrypoints=http
-  #     - traefik.http.routers.elasticsearch.service=elasticsearch
-  #
-  # kibana:
-  #   image: docker.elastic.co/kibana/kibana:8.4.0
-  #   environment:
-  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-  #     - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
-  #     - SERVER_NAME=kibana.edflex.local
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   depends_on:
-  #     - elasticsearch
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.kibana.rule=Host(`${KIBANA_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.kibana.loadbalancer.server.port=5601
-  #     - traefik.http.routers.kibana.entrypoints=http
-  #     - traefik.http.routers.kibana.service=kibana
-  #
-  # dejavu:
-  #   image: appbaseio/dejavu
-  #   ports:
-  #     - 1358:1358
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   depends_on:
-  #     - elasticsearch
-  #   environment:
-  #     - REACT_APP_ELASTICSEARCH_HOST=http://elasticsearch:9200
-  #     - http.port=9200
-  #     - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
-  #     - http.cors.enabled=true
-  #     - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
-  #     - http.cors.allow-credentials=true
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.dejavu.rule=Host(`${DEJAVU_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.dejavu.loadbalancer.server.port=1358
-  #     - traefik.http.routers.dejavu.entrypoints=http
-  #     - traefik.http.routers.dejavu.service=dejavu
-  #
-  # zookeeper:
-  #   image: bitnami/zookeeper:latest
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   environment:
-  #     - ALLOW_ANONYMOUS_LOGIN=yes
-  #   healthcheck:
-  #     test: nc -z localhost 2181 || exit -1
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
-  #     start_period: 10s
-  #
-  # kafka:
-  #   image: bitnami/kafka:latest
-  #   ports:
-  #     - 9092:9092
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   environment:
-  #     - KAFKA_BROKER_ID=1
-  #     - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-  #     - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
-  #     - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-  #     - ALLOW_PLAINTEXT_LISTENER=yes
-  #     - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-  #   depends_on:
-  #     zookeeper:
-  #       condition: service_healthy
-  #
-  # kafka-ui:
-  #   image: provectuslabs/kafka-ui:latest
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   environment:
-  #     - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-  #     - KAFKA_CLUSTERS_0_NAME=kafka
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.kafka.rule=Host(`${KAFKA_UI_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.kafka.loadbalancer.server.port=8080
-  #     - traefik.http.routers.kafka.entrypoints=http
-  #     - traefik.http.routers.kafka.service=kafka
-  #
-  # localstack:
-  #   image: localstack/localstack
-  #   dns:
-  #     - 172.16.2.254
-  #   networks:
-  #     - proxy
-  #   ports:
-  #     - 4566:4566            # LocalStack Gateway
-  #     - 4510-4559:4510-4559  # external services port range
-  #   environment:
-  #     # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
-  #     - DEBUG=${DEBUG:-0}
-  #   volumes:
-  #     - ./data/localstack/volume:/var/lib/localstack
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.localstack.rule=Host(`${LOCALSTACK_GATEWAY_SUBDOMAIN}.${DOMAIN}`)
-  #     - traefik.http.services.localstack.loadbalancer.server.port=4566
-  #     - traefik.http.routers.localstack.entrypoints=http
-  #     - traefik.http.routers.localstack.service=kafka
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: rootpass
+    volumes:
+      - ./data/minio:/data
+    networks:
+      - proxy
+    dns:
+      - 172.16.2.254
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minio-api.rule=Host(`${STORAGE_API_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.routers.minio-api.service=minio-api
+      - traefik.http.routers.minio-api.entrypoints=http
+      - traefik.http.services.minio-api.loadbalancer.server.port=9000
+      - traefik.http.routers.minio-admin.rule=Host(`${STORAGE_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.routers.minio-admin.service=minio-admin
+      - traefik.http.routers.minio-admin.entrypoints=http
+      - traefik.http.services.minio-admin.loadbalancer.server.port=9001
+    profiles:
+      - all
+      - minio
+
+  mailcatcher:
+    image: dockage/mailcatcher:0.8.2
+    networks:
+      - proxy
+    dns:
+      - 172.16.2.254
+    labels:
+      - name=mailcatcher
+      - traefik.enable=true
+      - traefik.http.services.mailcatcher.loadbalancer.server.port=1080
+      - traefik.http.routers.mailcatcher.rule=Host(`${MAIL_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.routers.mailcatcher.entrypoints=http
+    profiles:
+      - all
+      - mailcatcher
+
+  rabbitmq:
+    image: rabbitmq:3.10.10-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=root
+    dns:
+      - 172.16.2.254
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
+    networks:
+      - proxy
+    labels:
+      - name=rabbitmq
+      - traefik.enable=true
+      - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+      - traefik.http.routers.rabbitmq.rule=Host(`${RABBITMQ_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.routers.rabbitmq.entrypoints=http
+    profiles:
+      - all
+      - rabbitmq
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - 33006:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    dns:
+      - 172.16.2.254
+    volumes:
+      - ./data/mysql/data:/var/lib/mysql
+      - ./data/mysql/log:/var/log/mysql
+    networks:
+      - proxy
+    labels:
+      name: mysql
+    profiles:
+      - all
+      - mysql
+
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+    networks:
+      - proxy
+    labels:
+      - name=phpmyadmin
+      - traefik.enable=true
+      - traefik.http.routers.phpmyadmin.rule=Host(`${PHPMYADMIN_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.routers.phpmyadmin.entrypoints=http
+    profiles:
+      - all
+      - phpmyadmin
+
+  postgresql:
+    image: postgres
+    ports:
+      - 5432:5432
+    dns:
+      - 172.16.2.254
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
+    networks:
+      - proxy
+    profiles:
+      - all
+      - postgresql
+
+  pgadmin:
+    image: dpage/pgadmin4:8.9
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=root@${DOMAIN}
+      - PGADMIN_DEFAULT_PASSWORD=root
+      - PGADMIN_LISTEN_ADDRESS=0.0.0.0
+      - PGADMIN_LISTEN_PORT=8080
+    dns:
+      - 172.16.2.254
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pgadmin.rule=Host(`${PGADMIN_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.pgadmin.loadbalancer.server.port=8080
+      - traefik.http.routers.pgadmin.entrypoints=http
+    profiles:
+      - all
+      - pgadmin
+
+  redis:
+    image: redis:6-alpine
+    dns:
+      - 172.16.2.254
+    volumes:
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data/redis:/data
+    networks:
+      - proxy
+    command: redis-server /usr/local/etc/redis/redis.conf
+    labels:
+      name: redis
+    profiles:
+      - all
+      - redis
+
+  redisinsight:
+    image: redis/redisinsight
+    environment:
+      - RI_APP_PORT=5540
+      - RI_APP_HOST=0.0.0.0
+    volumes:
+      - ./data/redisinsight:/data
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.redisinsight.rule=Host(`${REDISINSIGHT_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.redisinsight.loadbalancer.server.port=5540
+      - traefik.http.routers.redisinsight.entrypoints=http
+    profiles:
+      - all
+      - redisinsight
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.1
+    depends_on:
+      - postgresql
+    environment:
+      - KC_DB_URL_HOST=postgresql
+      - KC_DB_URL_DATABASE=keycloak
+      - KC_DB_USERNAME=root
+      - KC_DB_PASSWORD=root
+      - KEYCLOAK_ADMIN=root
+      - KEYCLOAK_ADMIN_PASSWORD=root
+    command: start-dev --proxy-headers forwarded --http-relative-path=/auth
+    dns:
+      - 172.16.2.254
+    ports:
+      - 8080:8080
+    networks:
+      - proxy
+    labels:
+      - name=keycloak
+      - traefik.enable=true
+      - traefik.http.services.keycloak.loadbalancer.server.port=8080
+      - traefik.http.routers.keycloak.rule=((Host(`${DOMAIN}`) || HostRegexp(`{subdomain:[a-z0-9_-]+}.${DOMAIN}`)) && PathPrefix(`/auth`)
+      - traefik.http.routers.keycloak.entrypoints=http
+      - traefik.http.routers.keycloak.service=keycloak
+    profiles:
+      - all
+      - keycloak
+
+  cassandra:
+    image: cassandra
+    ports:
+      - 9042:9042
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    profiles:
+      - all
+      - cassandra
+
+  cassandra-web:
+    image: ipushc/cassandra-web
+    environment:
+      - CASSANDRA_HOST=cassandra
+      - CASSANDRA_PORT=9042
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cassandra-web.rule=Host(`${CASSANDRA_WEB_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.cassandra-web.loadbalancer.server.port=8083
+      - traefik.http.routers.cassandra-web.entrypoints=http
+      - traefik.http.routers.cassandra-web.service=cassandra-web
+    profiles:
+      - all
+      - cassandra-web
+
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ./data/ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ollama.rule=Host(`${LLM_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.ollama.loadbalancer.server.port=11434
+      - traefik.http.routers.ollama.entrypoints=http
+      - traefik.http.routers.ollama.service=ollama
+    profiles:
+      - all
+      - ollama
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    volumes:
+      - ./data/open-webui:/app/backend/data
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.open-webui.rule=Host(`${OPEN_WEBUI_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.open-webui.loadbalancer.server.port=8080
+      - traefik.http.routers.open-webui.entrypoints=http
+      - traefik.http.routers.open-webui.service=open-webui
+    profiles:
+      - all
+      - open-webui
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.2
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - search.max_buckets=100000
+      - indices.id_field_data.enabled=true
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+      - http.port=9200
+      - discovery.type=single-node
+      - http.max_content_length=10MB
+      - http.cors.enabled=true
+      - http.cors.allow-origin=\*
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+      - network.publish_host=localhost
+      - xpack.security.enabled=false
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    dns:
+      - 172.16.2.254
+    networks:
+        - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.elasticsearch.rule=Host(`${ELASTICSEARCH_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.elasticsearch.loadbalancer.server.port=9200
+      - traefik.http.routers.elasticsearch.entrypoints=http
+      - traefik.http.routers.elasticsearch.service=elasticsearch
+    profiles:
+      - all
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.4.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
+      - SERVER_NAME=kibana.edflex.local
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    depends_on:
+      - elasticsearch
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kibana.rule=Host(`${KIBANA_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.kibana.loadbalancer.server.port=5601
+      - traefik.http.routers.kibana.entrypoints=http
+      - traefik.http.routers.kibana.service=kibana
+    profiles:
+      - all
+      - kibana
+
+  dejavu:
+    image: appbaseio/dejavu
+    ports:
+      - 1358:1358
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    depends_on:
+      - elasticsearch
+    environment:
+      - REACT_APP_ELASTICSEARCH_HOST=http://elasticsearch:9200
+      - http.port=9200
+      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+      - http.cors.enabled=true
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dejavu.rule=Host(`${DEJAVU_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.dejavu.loadbalancer.server.port=1358
+      - traefik.http.routers.dejavu.entrypoints=http
+      - traefik.http.routers.dejavu.service=dejavu
+    profiles:
+      - all
+      - dejavu
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    healthcheck:
+      test: nc -z localhost 2181 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    profiles:
+      - all
+      - zookeeper
+
+  kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - 9092:9092
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    profiles:
+      - all
+      - kafka
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    environment:
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_NAME=kafka
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kafka.rule=Host(`${KAFKA_UI_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.kafka.loadbalancer.server.port=8080
+      - traefik.http.routers.kafka.entrypoints=http
+      - traefik.http.routers.kafka.service=kafka
+    profiles:
+      - all
+      - kafka-ui
+
+  localstack:
+    image: localstack/localstack
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    ports:
+      - 4566:4566            # LocalStack Gateway
+      - 4510-4559:4510-4559  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+    volumes:
+      - ./data/localstack/volume:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.localstack.rule=Host(`${LOCALSTACK_GATEWAY_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.services.localstack.loadbalancer.server.port=4566
+      - traefik.http.routers.localstack.entrypoints=http
+      - traefik.http.routers.localstack.service=kafka
+    profiles:
+      - all
+      - localstack
 
 networks:
   proxy:

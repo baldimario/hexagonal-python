@@ -3,7 +3,9 @@ SHELL := /bin/sh
 ENV ?= dev
 SERVICE ?= app
 
-DC ?= docker compose -f stack/docker/docker-compose.y*ml -f stack/docker/docker-compose.${ENV}.y*ml
+include .env.make
+
+DC ?= COMPOSE_PROFILES=${COMPOSE_PROFILES} docker compose -f stack/docker/docker-compose.y*ml -f stack/docker/docker-compose.${ENV}.y*ml
 
 help: ## Show this help
 	@echo -e "$$(grep -hE '^\S+:.*##' $(MAKEFILE_LIST) | sed -e 's/:.*##\s*/:/' -e 's/^\(.\+\):\(.*\)/\\x1b[36m\1\\x1b[m:\2/' | column -c2 -t -s :)"
