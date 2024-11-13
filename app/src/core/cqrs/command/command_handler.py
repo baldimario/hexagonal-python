@@ -1,7 +1,7 @@
 """Module containing base interfaces for command handlers."""
 
 from typing import Union, TypeVar
-from .handler import HandlerInterface
+from core.cqrs.handler import HandlerInterface
 from .command import BaseCommandInterface, CommandResponseInterface
 
 T = TypeVar("T", bound=BaseCommandInterface)  # pylint: disable=invalid-name

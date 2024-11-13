@@ -3,8 +3,8 @@ Domain module for the application.
 """
 
 from core.di import inject
-from core.cqrs.command_bus import CommandBusInterface
-from core.cqrs.query_bus import QueryBusInterface
+from core.cqrs.command import CommandBusInterface
+from core.cqrs.query import QueryBusInterface
 from example.domain.command.example_command import ExampleCommand
 from example.domain.query.example_query import ExampleQuery
 

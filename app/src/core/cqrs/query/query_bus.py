@@ -5,7 +5,7 @@ Module for handling query bus operations.
 from abc import ABC, abstractmethod
 from typing import Type, Union, TypeVar
 
-from .bus import BusInterface
+from core.cqrs.bus import BusInterface
 from .query import QueryInterface, QueryResponseInterface
 from .query_handler import QueryHandlerInterface
 

@@ -4,8 +4,8 @@
 # pyright: reportMissingImports=false
 # pyright: reportAttributeAccessIssue=false
 from unittest import TestCase
-from app.src.core.di import Container, di, inject
-from app.src.core.di.exceptions import ContainerServiceNotFoundError
+from core.di import Container, di, inject
+from core.di.exceptions import ContainerServiceNotFoundError
 
 
 class TestContainer(TestCase):

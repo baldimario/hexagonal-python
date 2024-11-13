@@ -3,7 +3,7 @@ Module for handling example commands.
 """
 
 from core.di import inject
-from core.cqrs.command_handler import CommandHandlerInterface
+from core.cqrs.command.command_handler import CommandHandlerInterface
 from example.domain.command.example_command import ExampleCommand
 
 

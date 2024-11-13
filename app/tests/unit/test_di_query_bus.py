@@ -5,11 +5,11 @@
 # pyright: reportAttributeAccessIssue=false
 from unittest.mock import Mock
 from unittest import TestCase
-from app.src.core.cqrs.query import QueryInterface
-from app.src.core.cqrs.query_handler import QueryHandlerInterface
-from app.src.core.cqrs.exceptions import QueryAlreadyRegistered, HandlerNotFound
-from app.src.core.cqrs.di_query_bus import DIQueryBus
-from app.src.core.di import Container
+from core.cqrs.query import QueryInterface
+from core.cqrs.query import QueryHandlerInterface
+from core.cqrs.exceptions import HandlerNotFound, QueryAlreadyRegistered
+from core.cqrs.query.bus import DIQueryBus
+from core.di import Container
 
 
 class TestDIQueryBus(TestCase):

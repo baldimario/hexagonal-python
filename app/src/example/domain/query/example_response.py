@@ -3,7 +3,7 @@ Module for example response.
 """
 
 from dataclasses import dataclass
-from core.cqrs.query_handler import QueryResponseInterface
+from core.cqrs.query.query import QueryResponseInterface
 
 
 @dataclass(frozen=True, kw_only=True)

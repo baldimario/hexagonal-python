@@ -4,8 +4,8 @@ Module containing custom exceptions for the CQRS system.
 
 from __future__ import annotations
 
-from core.cqrs.query import QueryInterface
-from .command import BaseCommandInterface
+from .query.query import QueryInterface
+from .command.command import BaseCommandInterface
 
 
 class CommandAlreadyRegistered(Exception):

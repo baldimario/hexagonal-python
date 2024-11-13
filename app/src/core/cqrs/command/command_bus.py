@@ -5,7 +5,7 @@ Module for handling command bus operations.
 from abc import ABC, abstractmethod
 from typing import Type, TypeVar
 
-from .bus import BusInterface
+from core.cqrs.bus import BusInterface
 from .command import BaseCommandInterface
 from .command_handler import CommandHandlerInterface
 

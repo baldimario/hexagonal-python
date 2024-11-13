@@ -3,7 +3,7 @@ Module for example command.
 """
 
 from dataclasses import dataclass
-from core.cqrs.command import CommandInterface
+from core.cqrs.command.command import CommandInterface
 
 
 @dataclass(frozen=True, kw_only=True)

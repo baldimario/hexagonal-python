@@ -1,7 +1,7 @@
 """Module containing base interfaces for query handlers."""
 
 from typing import Union, TypeVar
-from .handler import HandlerInterface
+from core.cqrs.handler import HandlerInterface
 from .query import QueryInterface, QueryResponseInterface
 
 T = TypeVar("T", bound=QueryInterface)  # pylint: disable=invalid-name

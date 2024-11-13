@@ -4,8 +4,8 @@ This file is used to setup the container with the necessary dependencies.
 
 from typing import Union
 from core.di import di, Container
-from core.cqrs.di_command_bus import DICommandBus
-from core.cqrs.di_query_bus import DIQueryBus
+from core.cqrs.command.bus.di_command_bus import DICommandBus
+from core.cqrs.query.bus.di_query_bus import DIQueryBus
 from example.infrastructure.cli.main import Main
 from example.domain.query.example_query import ExampleQuery
 from example.domain.query.example_handler import ExampleQueryHandler

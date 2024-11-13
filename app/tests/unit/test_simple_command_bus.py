@@ -5,9 +5,9 @@
 # pyright: reportAttributeAccessIssue=false
 from unittest.mock import Mock
 from unittest import TestCase
-from app.src.core.cqrs.command import BaseCommandInterface
-from app.src.core.cqrs.exceptions import CommandAlreadyRegistered, HandlerNotFound
-from app.src.core.cqrs.simple_command_bus import SimpleCommandBus
+from core.cqrs.command import BaseCommandInterface
+from core.cqrs.exceptions import HandlerNotFound, CommandAlreadyRegistered
+from core.cqrs.command.bus import SimpleCommandBus
 
 
 class TestSimpleCommandBus(TestCase):

@@ -1,4 +1,4 @@
-"""CQRS and query bus module."""
+"""CQRS and command bus module."""
 
 # pylint: disable=import-error
 # pyright: reportMissingImports=false
@@ -6,71 +6,73 @@
 # from behave import given, when, then
 from unittest.mock import Mock
 from behave import given, when, then
-from src.core.di import Container
-from src.core.cqrs.di_query_bus import DIQueryBus
-from src.core.cqrs.query import QueryInterface
-from src.core.cqrs.query_handler import QueryHandlerInterface
-from src.core.cqrs.exceptions import QueryAlreadyRegistered, HandlerNotFound
+from core.di import Container
+from core.cqrs.command.bus.di_command_bus import DICommandBus
+from core.cqrs.command.command import BaseCommandInterface
+from core.cqrs.command.command_handler import CommandHandlerInterface
+from core.cqrs.exceptions import CommandAlreadyRegistered, HandlerNotFound
 
 
-@given("a DI Query Bus")
-def given_di_query_bus(context):
+@given("a DI Command Bus")
+def given_di_command_bus(context):
     """
-    Sets up a DI Query Bus for the test context.
+    Sets up a DI Command Bus for the test context.
     """
     context.container = Container()
-    context.bus = DIQueryBus(context.container)
+    context.bus = DICommandBus(context.container)
 
 
-@given("a handler is already registered for a query")
+@given("a handler is already registered for a command")
 def given_handler_already_registered(context):
     """
-    Given a handler is already registered for a query.
+    Given a handler is already registered for a command.
 
     :param context: The test context.
     """
-    context.query = QueryInterface
-    context.handler = Mock(spec=QueryHandlerInterface)
-    context.bus.register_handler(context.query, context.handler)
+    context.command = BaseCommandInterface
+    context.handler = Mock(spec=CommandHandlerInterface)
+    context.bus.register_handler(context.command, context.handler)
 
 
-@when("I register a handler for a query")
+@when("I register a handler for a command")
 def when_register_handler(context):
     """
-    Registers a handler for a query.
+    Registers a handler for a command.
 
-    :param context: The context containing the query and handler.
+    :param context: The context containing the command and handler.
     """
-    context.query = QueryInterface
-    context.handler = Mock(spec=QueryHandlerInterface)
-    context.bus.register_handler(context.query, context.handler)
+    context.command = BaseCommandInterface
+    context.handler = Mock(spec=CommandHandlerInterface)
+    context.bus.register_handler(context.command, context.handler)
 
 
-@when("I try to register another handler for the same query")
+@when("I try to register another handler for the same command")
 def when_try_register_another_handler(context):
     """
-    Simulate attempting to register another handler for the same query.
+    Simulate attempting to register another handler for the same command.
     """
     try:
-        context.bus.register_handler(context.query, Mock(spec=QueryHandlerInterface))
-    except QueryAlreadyRegistered as e:
+        context.bus.register_handler(
+            context.command, Mock(spec=CommandHandlerInterface)
+        )
+    except CommandAlreadyRegistered as e:
         context.error = e
 
 
-@when("I execute the query")
-def when_execute_query(context):
+@when("I execute the command")
+def when_execute_command(context):
     """
-    Execute the query using the bus.
+    Execute the command using the bus.
 
-    :param context: The context containing the query to execute.
+    :param context: The context containing the command to execute.
     """
     try:
-        context.bus.execute(context.query())
+        context.bus.execute(context.command())
     except HandlerNotFound as e:
         context.error = e
 
 
-@then("the command handler is registered in the bus")
+@then("the query handler is registered in the bus")
 def then_handler_registered(context):
     """
     Verify that the handler is registered in the bus.
@@ -81,17 +83,17 @@ def then_handler_registered(context):
     )
 
 
-@then("a QueryAlreadyRegistered error is raised")
-def then_query_already_registered_error(context):
+@then("a CommandAlreadyRegistered error is raised")
+def then_command_already_registered_error(context):
     """
-    Verifies that a QueryAlreadyRegistered error is raised.
+    Verifies that a CommandAlreadyRegistered error is raised.
 
     :param context: The test context.
     """
-    assert isinstance(context.error, QueryAlreadyRegistered)
+    assert isinstance(context.error, CommandAlreadyRegistered)
 
 
-@then("the command handler is called")
+@then("the query handler is called")
 def then_handler_called(context):
     """
     Verify that the handler is called.
@@ -99,7 +101,7 @@ def then_handler_called(context):
     assert context.handler.called
 
 
-@then("a HandlerNotFound error is raised from command bus")
+@then("a HandlerNotFound error is raised from query bus")
 def then_handler_not_found_error(context):
     """
     Verifies that a HandlerNotFound error is raised.
@@ -109,25 +111,25 @@ def then_handler_not_found_error(context):
     assert isinstance(context.error, HandlerNotFound)
 
 
-@given("a handler is registered for a query")
+@given("a handler is registered for a command")
 def given_handler_registered_for_a_command(context):
     """
-    Registers a handler for a query.
+    Registers a handler for a command.
 
     :param context: The test context.
     """
-    context.query = QueryInterface
-    context.handler = Mock(spec=QueryHandlerInterface)
-    context.bus.register_handler(context.query, context.handler)
+    context.command = BaseCommandInterface
+    context.handler = Mock(spec=CommandHandlerInterface)
+    context.bus.register_handler(context.command, context.handler)
 
 
-@given("no handler is registered for a query")
-def given_no_handler_registered_for_a_query(context):
+@given("no handler is registered for a command")
+def given_no_handler_registered_for_a_command(context):
     """
-    Ensures no handler is registered for a query.
+    Ensures no handler is registered for a command.
 
     :param context: The test context.
     """
     # Ensure no handler is registered for a command
     context.handler = None
-    context.query = lambda: None
+    context.command = lambda: None

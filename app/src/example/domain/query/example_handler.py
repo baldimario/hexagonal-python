@@ -3,7 +3,7 @@ Module for handling example queries.
 """
 
 from core.di import inject
-from core.cqrs.query_handler import QueryHandlerInterface
+from core.cqrs.query import QueryHandlerInterface
 from example.domain.query.example_query import ExampleQuery
 from example.domain.query.example_response import ExampleResponse
 
