@@ -57,7 +57,7 @@ When using this project template, you should copy the template, keep what you ne
     - AWS Lambda
     - OpenFaas
     - Celery
-- 🔄 Docker Services Preset with Reverse Proxy:
+- ✅ Docker Services Preset with Reverse Proxy:
     - ✅ Traefik
     - ✅ Mailcatcher
     - ✅ Redis
@@ -77,7 +77,7 @@ When using this project template, you should copy the template, keep what you ne
     - ✅ ElasticSearch
     - ✅ Kibana
     - ✅ Dejavu
-    - Localstack
+    - ✅ Localstack
 
 
 ## Usage
