@@ -232,6 +232,7 @@ services:
       - traefik.http.routers.redisinsight.rule=Host(`${REDISINSIGHT_SUBDOMAIN}.${DOMAIN}`)
       - traefik.http.services.redisinsight.loadbalancer.server.port=5540
       - traefik.http.routers.redisinsight.entrypoints=http
+      - traefik.http.routers.redisinsight.service=redisinsight
     profiles:
       - all
       - redisinsight
@@ -506,6 +507,20 @@ services:
     profiles:
       - all
       - localstack
+
+  mosquitto:
+    image: eclipse-mosquitto
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    ports:
+      - 1883:1883
+    #volumes:
+    #  - data/mosquitto/config:/mosquitto/config
+    profiles:
+      - all
+      - mosquitto
 
 networks:
   proxy:

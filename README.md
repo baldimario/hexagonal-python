@@ -78,6 +78,7 @@ When using this project template, you should copy the template, keep what you ne
     - ✅ Kibana
     - ✅ Dejavu
     - ✅ Localstack
+    - ✅ Mosquitto
 
 ## Enable Services using docker compose profiles
 
@@ -215,7 +216,7 @@ make coverage-html
 
 ---
 
-## Web Dashboards on reverse proxy
+## Web dashboards behind reverse proxy
 
 `lvh.me` is a special domain name that resolves to `127.0.0.1` (`localhost`) by default. This allows you to use it as a shortcut for local development, instead of `*.localhost`. All its subdomains also point to `127.0.0.1`, making it a convenient choice for local development environments.
 
