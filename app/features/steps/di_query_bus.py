@@ -9,7 +9,7 @@ from behave import given, when, then
 from core.di import Container
 from core.cqrs.query.bus.di_query_bus import DIQueryBus
 from core.cqrs.query.query import QueryInterface
-from core.cqrs.query.query_handler import QueryHandlerInterface
+from core.cqrs.handler import HandlerInterface
 from core.cqrs.exceptions import QueryAlreadyRegistered, HandlerNotFound
 
 
@@ -30,7 +30,7 @@ def given_handler_already_registered(context):
     :param context: The test context.
     """
     context.query = QueryInterface
-    context.handler = Mock(spec=QueryHandlerInterface)
+    context.handler = Mock(spec=HandlerInterface)
     context.bus.register_handler(context.query, context.handler)
 
 
@@ -42,7 +42,7 @@ def when_register_handler(context):
     :param context: The context containing the query and handler.
     """
     context.query = QueryInterface
-    context.handler = Mock(spec=QueryHandlerInterface)
+    context.handler = Mock(spec=HandlerInterface)
     context.bus.register_handler(context.query, context.handler)
 
 
@@ -52,7 +52,7 @@ def when_try_register_another_handler(context):
     Simulate attempting to register another handler for the same query.
     """
     try:
-        context.bus.register_handler(context.query, Mock(spec=QueryHandlerInterface))
+        context.bus.register_handler(context.query, Mock(spec=HandlerInterface))
     except QueryAlreadyRegistered as e:
         context.error = e
 
@@ -117,7 +117,7 @@ def given_handler_registered_for_a_command(context):
     :param context: The test context.
     """
     context.query = QueryInterface
-    context.handler = Mock(spec=QueryHandlerInterface)
+    context.handler = Mock(spec=HandlerInterface)
     context.bus.register_handler(context.query, context.handler)
 
 

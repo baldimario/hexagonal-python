@@ -3,12 +3,12 @@ Module for handling example commands.
 """
 
 from core.di import inject
-from core.cqrs.command.command_handler import CommandHandlerInterface
+from core.cqrs.handler import HandlerInterface
 from example.domain.command.example_command import ExampleCommand
 
 
 @inject
-class ExampleCommandHandler(CommandHandlerInterface):
+class ExampleCommandHandler(HandlerInterface):
     """
     Handles ExampleCommand instances.
     """

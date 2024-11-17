@@ -5,12 +5,12 @@ Module for handling simple command bus operations.
 from typing import Dict, Type
 from core.cqrs.exceptions import HandlerNotFound
 from core.cqrs.command.command import BaseCommandInterface
-from core.cqrs.command.command_bus import CommandBusInterface
-from core.cqrs.command.types import CommandHandlerType
+from core.cqrs.bus import BusInterface
+from core.cqrs.handler import HandlerType
 from core.cqrs.exceptions import CommandAlreadyRegistered
 
 
-class SimpleCommandBus(CommandBusInterface):
+class SimpleCommandBus(BusInterface):
     """
     A simple implementation of the Command Bus pattern.
 
@@ -20,10 +20,10 @@ class SimpleCommandBus(CommandBusInterface):
     """
 
     def __init__(self) -> None:
-        self._handlers: Dict[Type[BaseCommandInterface], CommandHandlerType] = {}
+        self._handlers: Dict[Type[BaseCommandInterface], HandlerType] = {}
 
     def register_handler(
-        self, cq: Type[BaseCommandInterface], handler: CommandHandlerType
+        self, cq: Type[BaseCommandInterface], handler: HandlerType
     ) -> None:
         """
         Registers a command handler for a specific command type.

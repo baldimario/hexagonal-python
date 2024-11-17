@@ -3,15 +3,13 @@ Module for handling example queries.
 """
 
 from core.di import inject
-from core.cqrs.query import QueryHandlerInterface
+from core.cqrs.handler import HandlerInterface
 from example.domain.query.example_query import ExampleQuery
 from example.domain.query.example_response import ExampleResponse
 
 
 @inject
-class ExampleQueryHandler(  # pylint: disable=too-few-public-methods
-    QueryHandlerInterface
-):
+class ExampleQueryHandler(HandlerInterface):  # pylint: disable=too-few-public-methods
     """
     Handles ExampleQuery instances.
     """

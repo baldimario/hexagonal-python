@@ -8,13 +8,13 @@ import asyncio
 from aioamqp.exceptions import EmptyQueue  # pyright: ignore
 from core.cqrs.async_rabbitmq_bus import RabbitMQBusInterface
 from core.cqrs.query.query import QueryInterface, QueryResponseInterface
-from core.cqrs.query.query_handler import QueryHandlerInterface
+from core.cqrs.handler import HandlerInterface
 from core.cqrs.exceptions import HandlerNotFound
 from core.broker.rabbitmq import RabbitMQBroker
 from core.cqrs.async_protocol import AsyncProtocol
 
 T = TypeVar("T", bound=QueryInterface)  # pylint: disable=invalid-name
-H = TypeVar("H", bound=QueryHandlerInterface)  # pylint: disable=invalid-name
+H = TypeVar("H", bound=HandlerInterface)  # pylint: disable=invalid-name
 
 
 class RabbitMQQueryBus(RabbitMQBusInterface[T, H, None], ABC):

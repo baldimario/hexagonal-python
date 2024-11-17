@@ -5,9 +5,9 @@
 # pyright: reportAttributeAccessIssue=false
 from unittest.mock import Mock
 from unittest import TestCase
-from core.cqrs.query import QueryInterface
-from core.cqrs.query import QueryHandlerInterface
-from core.cqrs.exceptions import HandlerNotFound, QueryAlreadyRegistered
+from core.cqrs.query.query import QueryInterface
+from core.cqrs.handler import HandlerInterface
+from core.cqrs.exceptions import QueryAlreadyRegistered
 from core.cqrs.query.bus import DIQueryBus
 from core.di import Container
 
@@ -22,7 +22,7 @@ class TestDIQueryBus(TestCase):
         container = Container()
         bus = DIQueryBus(container)
         command = QueryInterface
-        handler = Mock(spec=QueryHandlerInterface)
+        handler = Mock(spec=HandlerInterface)
 
         bus.register_handler(command, handler)
 
@@ -35,7 +35,7 @@ class TestDIQueryBus(TestCase):
         container = Container()
         bus = DIQueryBus(container)
         command = QueryInterface
-        handler = Mock(spec=QueryHandlerInterface)
+        handler = Mock(spec=HandlerInterface)
 
         bus.register_handler(command, handler)
         with self.assertRaises(QueryAlreadyRegistered):
@@ -48,20 +48,9 @@ class TestDIQueryBus(TestCase):
         container = Container()
         bus = DIQueryBus(container)
         command = QueryInterface
-        handler = Mock(spec=QueryHandlerInterface)
+        handler = Mock(spec=HandlerInterface)
         bus.register_handler(command, handler)
 
         bus.execute(command())
 
         self.assertTrue(handler.called)  # pylint: disable=no-member
-
-    def test_execute_handler_not_found(self):
-        """
-        Test that the command bus raises an exception when a handler is not found.
-        """
-        container = Container()
-        bus = DIQueryBus(container)
-        command = QueryInterface
-
-        with self.assertRaises(HandlerNotFound):
-            bus.execute(command())

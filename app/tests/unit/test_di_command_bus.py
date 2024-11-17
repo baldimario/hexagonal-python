@@ -6,7 +6,7 @@
 from unittest.mock import Mock
 from unittest import TestCase
 from core.cqrs.command.command import BaseCommandInterface
-from core.cqrs.command.command_handler import CommandHandlerInterface
+from core.cqrs.handler import HandlerInterface
 from core.cqrs.exceptions import HandlerNotFound, CommandAlreadyRegistered
 from core.cqrs.command.bus.di_command_bus import DICommandBus
 from core.di import Container
@@ -22,7 +22,7 @@ class TestDICommandBus(TestCase):
         container = Container()
         bus = DICommandBus(container)
         command = BaseCommandInterface
-        handler = Mock(spec=CommandHandlerInterface)
+        handler = Mock(spec=HandlerInterface)
 
         bus.register_handler(command, handler)
 
@@ -35,7 +35,7 @@ class TestDICommandBus(TestCase):
         container = Container()
         bus = DICommandBus(container)
         command = BaseCommandInterface
-        handler = Mock(spec=CommandHandlerInterface)
+        handler = Mock(spec=HandlerInterface)
 
         bus.register_handler(command, handler)
         with self.assertRaises(CommandAlreadyRegistered):
@@ -48,7 +48,7 @@ class TestDICommandBus(TestCase):
         container = Container()
         bus = DICommandBus(container)
         command = BaseCommandInterface
-        handler = Mock(spec=CommandHandlerInterface)
+        handler = Mock(spec=HandlerInterface)
         bus.register_handler(command, handler)
 
         bus.execute(command())

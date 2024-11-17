@@ -5,12 +5,12 @@ Module for handling simple command bus operations.
 from typing import Dict, Type, Union
 from core.cqrs.exceptions import HandlerNotFound
 from core.cqrs.query.query import QueryInterface, QueryResponseInterface
-from core.cqrs.query.query_bus import QueryBusInterface
-from core.cqrs.query.types import QueryHandlerType
+from core.cqrs.bus import BusInterface
+from core.cqrs.handler import HandlerType
 from core.cqrs.exceptions import QueryAlreadyRegistered
 
 
-class SimpleQueryBus(QueryBusInterface):
+class SimpleQueryBus(BusInterface):
     """
     A simple implementation of the Query Bus pattern.
 
@@ -20,17 +20,15 @@ class SimpleQueryBus(QueryBusInterface):
     """
 
     def __init__(self) -> None:
-        self._handlers: Dict[Type[QueryInterface], QueryHandlerType] = {}
+        self._handlers: Dict[Type[QueryInterface], HandlerType] = {}
 
-    def register_handler(
-        self, cq: Type[QueryInterface], handler: QueryHandlerType
-    ) -> None:
+    def register_handler(self, cq: Type[QueryInterface], handler: HandlerType) -> None:
         """
         Registers a query handler for a specific query type.
 
         Args:
             cq (Type[QueryInterface]): The query type to register the handler for.
-            handler (QueryHandlerType): The handler function to register.
+            handler (HandlerType): The handler function to register.
 
         Raises:
             QueryAlreadyRegistered: If a handler is already registered for the query type.

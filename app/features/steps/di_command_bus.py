@@ -9,7 +9,7 @@ from behave import given, when, then
 from core.di import Container
 from core.cqrs.command.bus.di_command_bus import DICommandBus
 from core.cqrs.command.command import BaseCommandInterface
-from core.cqrs.command.command_handler import CommandHandlerInterface
+from core.cqrs.handler import HandlerInterface
 from core.cqrs.exceptions import CommandAlreadyRegistered, HandlerNotFound
 
 
@@ -30,7 +30,7 @@ def given_handler_already_registered(context):
     :param context: The test context.
     """
     context.command = BaseCommandInterface
-    context.handler = Mock(spec=CommandHandlerInterface)
+    context.handler = Mock(spec=HandlerInterface)
     context.bus.register_handler(context.command, context.handler)
 
 
@@ -42,7 +42,7 @@ def when_register_handler(context):
     :param context: The context containing the command and handler.
     """
     context.command = BaseCommandInterface
-    context.handler = Mock(spec=CommandHandlerInterface)
+    context.handler = Mock(spec=HandlerInterface)
     context.bus.register_handler(context.command, context.handler)
 
 
@@ -52,9 +52,7 @@ def when_try_register_another_handler(context):
     Simulate attempting to register another handler for the same command.
     """
     try:
-        context.bus.register_handler(
-            context.command, Mock(spec=CommandHandlerInterface)
-        )
+        context.bus.register_handler(context.command, Mock(spec=HandlerInterface))
     except CommandAlreadyRegistered as e:
         context.error = e
 
@@ -119,7 +117,7 @@ def given_handler_registered_for_a_command(context):
     :param context: The test context.
     """
     context.command = BaseCommandInterface
-    context.handler = Mock(spec=CommandHandlerInterface)
+    context.handler = Mock(spec=HandlerInterface)
     context.bus.register_handler(context.command, context.handler)
 
 

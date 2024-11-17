@@ -6,13 +6,12 @@ from typing import Type
 from core.di import Container
 from core.cqrs.exceptions import HandlerNotFound
 from core.cqrs.command.command import BaseCommandInterface
-from core.cqrs.command.command_bus import CommandBusInterface
-from core.cqrs.command.types import CommandHandlerType
-from core.cqrs.command.command_handler import CommandHandlerInterface
+from core.cqrs.bus import BusInterface
+from core.cqrs.handler import HandlerType, HandlerInterface
 from core.cqrs.exceptions import CommandAlreadyRegistered
 
 
-class DICommandBus(CommandBusInterface):
+class DICommandBus(BusInterface):
     """
     A command bus implementation that utilizes a dependency injection container.
     """
@@ -21,7 +20,7 @@ class DICommandBus(CommandBusInterface):
         self._container = container
 
     def register_handler(
-        self, cq: Type[BaseCommandInterface], handler: CommandHandlerType
+        self, cq: Type[BaseCommandInterface], handler: HandlerType
     ) -> None:
         """
         Registers a command handler for a given command type.
@@ -31,10 +30,10 @@ class DICommandBus(CommandBusInterface):
             handler: The handler function to register.
 
         Raises:
-            ValueError: If the handler is not a subclass of CommandHandlerInterface.
+            ValueError: If the handler is not a subclass of HandlerInterface.
             CommandAlreadyRegistered: If a handler is already registered for the command.
         """
-        if not issubclass(handler.__class__, CommandHandlerInterface):
+        if not issubclass(handler.__class__, HandlerInterface):
             raise ValueError("Handler must be a subclass of Handler[TCommand]")
 
         if cq in self._container:

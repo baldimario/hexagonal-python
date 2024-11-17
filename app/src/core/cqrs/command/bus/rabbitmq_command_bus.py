@@ -6,13 +6,13 @@ from abc import ABC
 from typing import Type, TypeVar, Any, Dict, Union
 from core.cqrs.async_rabbitmq_bus import RabbitMQBusInterface
 from core.cqrs.command.command import BaseCommandInterface
-from core.cqrs.command.command_handler import CommandHandlerInterface
+from core.cqrs.handler import HandlerInterface
 from core.cqrs.exceptions import HandlerNotFound
 from core.broker.rabbitmq import RabbitMQBroker
 from core.cqrs.async_protocol import AsyncProtocol
 
 T = TypeVar("T", bound=BaseCommandInterface)  # pylint: disable=invalid-name
-H = TypeVar("H", bound=CommandHandlerInterface)  # pylint: disable=invalid-name
+H = TypeVar("H", bound=HandlerInterface)  # pylint: disable=invalid-name
 
 
 class RabbitMQCommandBus(RabbitMQBusInterface[T, H, None], ABC):

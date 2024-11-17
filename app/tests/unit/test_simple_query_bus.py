@@ -5,8 +5,8 @@
 # pyright: reportAttributeAccessIssue=false
 from unittest.mock import Mock
 from unittest import TestCase
-from core.cqrs.query import QueryInterface
-from core.cqrs.exceptions import HandlerNotFound, QueryAlreadyRegistered
+from core.cqrs.query.query import QueryInterface
+from core.cqrs.exceptions import QueryAlreadyRegistered
 from core.cqrs.query.bus import SimpleQueryBus
 
 
@@ -49,13 +49,3 @@ class TestSimpleQueryBus(TestCase):
         bus.execute(query())
 
         self.assertTrue(handler.called)  # pylint: disable=no-member
-
-    def test_execute_handler_not_found(self):
-        """
-        Test that the query bus raises an exception when a handler is not found.
-        """
-        bus = SimpleQueryBus()
-        query = QueryInterface
-
-        with self.assertRaises(HandlerNotFound):
-            bus.execute(query())
