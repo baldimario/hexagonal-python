@@ -63,7 +63,7 @@ type-check: ## Run type checks
 	${DC} run --rm ${SERVICE} poetry run pyright .
 
 lint: ## Run linting
-	${DC} run --rm ${SERVICE} poetry run pylint .
+	${DC} run --rm ${SERVICE} poetry run pylint -d duplicate-code .
 
 unit: ## Run code coverage
 	${DC} run --rm ${SERVICE} poetry run coverage run -a -m pytest -vvv

@@ -1,1 +1,1 @@
-COMPOSE_PROFILES=default,rabbitmq
+COMPOSE_PROFILES=default,zookeeper,kafka,kafka-ui

@@ -2,6 +2,7 @@
 Module for handling example commands.
 """
 
+import logging
 from core.di import inject
 from core.cqrs.handler import HandlerInterface
 from example.domain.command.example_command import ExampleCommand
@@ -17,6 +18,6 @@ class ExampleCommandHandler(HandlerInterface):
         self.foo = foo  # pylint: disable=disallowed-name
 
     def __call__(self, command: ExampleCommand):
-        print("Handler", command.parameter_one)
-        print("Handler", command.parameter_two)
-        print("Handler", self.foo)
+        logging.info("Handler %s", command.parameter_one)
+        logging.info("Handler %s", command.parameter_two)
+        logging.info("Handler %s", self.foo)

@@ -10,6 +10,7 @@ readme = "README.md"
 python = "^3.10"
 requests = "^2.32.3"
 aioamqp = "^0.15.0"
+kafka-python = {git = "https://github.com/dpkp/kafka-python.git"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"

@@ -2,6 +2,7 @@
 Domain module for the application.
 """
 
+import logging
 from core.di import inject
 from core.cqrs.async_rabbitmq_bus import RabbitMQBusInterface
 from example.domain.command.example_command import ExampleCommand
@@ -26,13 +27,13 @@ class Main:  # pylint: disable=too-few-public-methods
 
     async def run(self):
         """Run method."""
-        print("Main CLI (di)", self.foo)
+        logging.info("Main CLI (di) %s", self.foo)
 
         result = await self.query_bus.execute(
             ExampleQuery(parameter_one="buz", parameter_two="bax")
         )
 
-        print("Main CLI (qb)", result)
+        logging.info("Main CLI (qb) %s", result)
 
         parameter = getattr(result, "result", "two")
 

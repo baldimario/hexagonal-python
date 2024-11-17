@@ -387,6 +387,27 @@ files = [
 colors = ["colorama (>=0.4.6)"]
 
 [[package]]
+name = "kafka-python"
+version = "2.0.3.dev0"
+description = "Pure Python client for Apache Kafka"
+optional = false
+python-versions = "*"
+files = []
+develop = false
+
+[package.extras]
+crc32c = ["crc32c"]
+lz4 = ["lz4"]
+snappy = ["python-snappy"]
+zstd = ["zstandard"]
+
+[package.source]
+type = "git"
+url = "https://github.com/dpkp/kafka-python.git"
+reference = "HEAD"
+resolved_reference = "a6d0579d3cadd3826dd364b01bc12a2173139abc"
+
+[[package]]
 name = "mccabe"
 version = "0.7.0"
 description = "McCabe checker, plugin for flake8"
@@ -674,4 +695,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "81b36559756b60c9796bfba1d80e2bff2f5ed04b6d84a32ccb152ba0364e5f23"
+content-hash = "492273981e76894b2ecbc12da655dbf30b827d44bab90ca2ebfe7176df9fe518"
