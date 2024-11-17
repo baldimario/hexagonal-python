@@ -32,7 +32,7 @@ When using this project template, you should copy the template, keep what you ne
             - ✅ dependency injection
             - kafka
             - pulsar
-            - rabbitmq
+            - ✅ rabbitmq
             - redis pub/sub
             - amazon sqs
             - mqtt

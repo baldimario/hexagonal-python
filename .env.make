@@ -1,1 +1,1 @@
-COMPOSE_PROFILES=default
+COMPOSE_PROFILES=default,rabbitmq

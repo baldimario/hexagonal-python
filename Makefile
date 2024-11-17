@@ -23,7 +23,7 @@ up: ## Start docker containers
 	${DC} up -d
 
 run: ## Start docker containers attached
-	${DC} up
+	${DC} up ${SERVICE}
 
 down: ## Shutdown docker containers
 	${DC} down

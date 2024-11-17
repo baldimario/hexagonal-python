@@ -15,7 +15,8 @@ async def main():
     """
     The main entry point for the application
     """
-    await di["example.infrastructure.cli.main"].run()
+    listeners = ["query_bus", "command_bus"]
+    await asyncio.gather(*[di[listener].listen() for listener in listeners])
 
 
 if __name__ == "__main__":

@@ -40,14 +40,14 @@ def when_container_has_service(context, container, service, value):
 
 
 @when('the container "{container}" is set up')
-def when_container_setup(context, container):
+async def when_container_setup(context, container):
     """
     Sets up the specified container.
 
     :param context: The context object.
     :param container: The name of the container to set up.
     """
-    container_setup(container=context.containers[container])
+    await container_setup(container=context.containers[container])
 
 
 @when('an Example class with parameter is injected with "{container}" container')

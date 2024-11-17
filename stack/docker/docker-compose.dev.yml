@@ -3,6 +3,7 @@ services:
     extends:
       file: docker-compose.yml
       service: app
+    command: poetry run python src/main.py
     dns:
       - 172.16.2.254
     networks:
@@ -19,6 +20,28 @@ services:
       - all
       - default
       - app
+
+  cosumer:
+    extends:
+      file: docker-compose.yml
+      service: app
+    command: poetry run python src/consumer.py
+    dns:
+      - 172.16.2.254
+    networks:
+      - proxy
+    build:
+      context: ../../
+      dockerfile: stack/docker/python/Dockerfile
+      target: dev
+    volumes:
+      - ../../app:/app
+    env_file:
+      - ../../app/.env.dev
+    profiles:
+      - all
+      - default
+      - consumer
 
   dnsmasq:
     build:
